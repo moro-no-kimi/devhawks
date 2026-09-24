@@ -2,7 +2,7 @@
 
 ## 1. Mission and governing decisions
 
-Provide an internal operator with a trustworthy daily view of LEGO sets listed as retiring on the official United States storefront, highlighting observed discounts and preserving historical observations.
+Provide an internal operator with a trustworthy daily view of every product in the official United States LEGO Last Chance to Buy category, highlighting observed discounts and preserving historical observations.
 
 The system supports an operator's decision to inspect an offer on LEGO's store. It does not predict retirement, guarantee inventory or checkout prices, or purchase products.
 
@@ -13,22 +13,20 @@ The system supports an operator's decision to inspect an offer on LEGO's store. 
 - Internal operator use only: no public visitors or public catalog.
 - The operator and product owner are the same person.
 - Invite-only operator sign-in using Amplify Gen 2/Cognito; no public signup.
-- United States storefront and USD; include retiring sets, highlighting discounts on those sets only.
+- United States storefront and USD; include every product in the official category, including building sets, clothing, shoes, and other merchandise. Highlight discounts only on category members.
 - Daily collection at 06:00 in `America/New_York`, respecting daylight saving time.
-- Mobile-friendly catalog with name/number search, theme and discount filters, price sorting, and a separate "No longer listed" archive.
+- Mobile-friendly catalog with name/product-code search, theme and discount filters, price sorting, and a separate "No longer listed" archive.
 - Retain partial observations for diagnostics and eligible resume, but publish catalog changes only after a complete validated scan.
 - Preserve the last successful catalog when collection fails; show failures and stale data explicitly.
 - Sentry integrates with Slack for operational alerts.
 - Independent GitHub Copilot PR review; coding agents iterate on feedback until the reviewer is satisfied.
 - Additional delivery gates include Habit Hooks, readability linting, unit tests, and Amplify-integrated Cypress behavior tests.
 
-This document describes the operating concept and a SEMP-equivalent delivery framework. It does not authorize implementation or deployment. No project workspace is attached and no app code has been created.
+This document describes the operating concept and a SEMP-equivalent delivery framework. The local workspace is attached at `C:\Users\RyanWalden\Repositories\devhawks`; its repository contains only this plan. On 2026-09-24 the operator authorized Section 2 acquisition research. Research probes and evidence are retained outside the repository in the session artifacts; no app or infrastructure has been implemented or deployed. Plan approval does not itself authorize those later activities.
 
 ### Visual guide
 
-Mermaid diagrams show system context, acquisition choices, information flow, set lifecycle, operational feedback, and the engineering review/release loop. Tables define decisions and acceptance evidence. They are conceptual diagrams, not measured production charts; no synthetic price or reliability trends are presented as data.
-
-Diagrams use an explicit dark-background palette for VS Code, with light text and connectors, dark edge-label backgrounds, and sans-serif labels. Flowchart HTML labels are disabled to reduce preview clipping.
+Mermaid diagrams show system context, acquisition choices, information flow, product lifecycle, operational feedback, and the engineering review/release loop. Tables define decisions and acceptance evidence. They are conceptual diagrams, not measured production charts; no synthetic price or reliability trends are presented as data.
 
 ## 2. Source evidence and acquisition research
 
@@ -43,15 +41,33 @@ Observed evidence:
 - Cards include USD prices and official product links. Some show "Exclusives" rather than "Retiring soon"; category membership, not a required card badge, establishes retirement evidence.
 - Recommendation placements, navigation links, and unrelated products must be excluded. Counting every article on the page is not a reliable listing count.
 
-The tracker means "sets observed in this official category," not "every LEGO set that may retire."
+The tracker means "products observed in this official category," not "every LEGO product that may retire." On 2026-09-24 the operator explicitly chose all category products, superseding a briefly considered building-sets-only restriction. Product type is not an exclusion rule.
 
 ### 2.2 Research performed and limits
 
-A bounded inspection of the shared page refresh and browser resource entries identified GraphQL traffic for localization, login, flags, consent, banners, and user queries. It did **not** establish a reusable product-list API response. Account-related requests are not collection inputs; no credentials or personal response bodies are needed.
+**Local research executed 2026-09-24.** Fresh browser contexts were created without personal storage state and closed after each check. "Load More" was verified by waiting for the next pagination link and 46 rendered category products, not merely a URL change. Resource timing and an operation-specific response wait exposed `POST /api/graphql/ProductListingLoadMoreQuery`. Account, consent, and analytics response bodies were not collection inputs.
 
-The rendered page contains JSON-LD and `__NEXT_DATA__`. Inspection of its embedded Apollo state found a `productListing` root field, listing metadata and pagination objects, and 22 `ProductTile`/`SingleVariantProduct` records. This is concrete evidence for a structured page-data extraction candidate, not proof that direct HTTP requests from AWS will obtain identical content.
+The observed operation uses `slug: "/categories/last-chance-to-buy"`, `page`, and `reservedTiles`, with `x-locale: en-US`. A reduced product-only GraphQL selection was independently replayed using local Python standard-library HTTP, JSON content type, and locale headers: no cookies, authorization header, copied session identifier, or browser execution. It returned HTTP 200. The probe subsequently traversed all pages using source pagination, not fixed totals.
 
-The attempted interactive pagination inspection did not establish the next-page product response. A fresh-session audit must still verify pagination, response schemas, and unattended access. A simplified text fetch returning no products is not proof that the underlying HTML lacks structured data.
+Raw HTML independently returned `__NEXT_DATA__.props.pageProps.__APOLLO_STATE__`. The extractor follows the category-specific `ROOT_QUERY.productListing(...)` reference and its `tiles`; it does not scan every cached product or every rendered article. `DiscoverTile` and `GiftWithPurchaseTile` placements are excluded, while every referenced `ProductTile` is retained, including `MultiVariantProduct`.
+
+| Check | Measured local result | Limit |
+|---|---|---|
+| Cookie-free HTML traversal | 13 pages, 302 unique products; page sizes 22, then 24, with 16 on the last page; cumulative totals matched | Counts describe this observation only |
+| Product-only API traversal | Same 13 pages and 302 identities, including 280 single-variant and 22 multi-variant products | Product types do not distinguish building sets from all merchandise |
+| Response body volume | HTML 18,954,851 bytes; API 231,047 bytes across 13 pages, excluding boundary rechecks | Different projections; not wire-byte measurements or production cost estimates |
+| Repeat/boundary checks | A repeated HTML traversal passed first/last-page record checks; API traversal also passed its boundary checks | Boundary matches do not prove interior-page stability or a source snapshot |
+| Browser comparison | Pages 1, 2, and 13: 62 identities/names/US links and 56 single-variant current/regular price pairs matched embedded data and independent HTTP capture fingerprints | Not every rendered page, availability label, or multi-variant price was checked |
+| Real discount | Product 10345 displayed regular $109.99 and current $87.99, matching 10999/8799 cents and the displayed 20% badge | Conditional/member prices were not substituted |
+| Probe tests | 10 deterministic tests passed, including wrong locale/currency, missing references, null fields, promotions, variants, duplicate identities, and incomplete/changing pagination | Research tests, not application CI or delivery-gate acceptance |
+
+**Consistency failures remain evidence, not waived checks.** The first full HTML traversal found 302 unique products but failed boundary revalidation: product 43021's theme changed from `Nike` to `LEGO Editions` (the source includes trademark/spacing presentation). A bounded repeat passed. Comparing the full API traversal against that repeat found one difference: product 11207 had theme `Marvel` in HTML and `Spider-Man` in the API. Its API research report remains failed for cross-candidate equivalence; the differing label was not silently normalized or overwritten. All other captured record fields and page identities matched in that comparison. This may reflect source/cache variation; its cause has not been established.
+
+Product 40824 explicitly returned a null theme. Preserve unknown as unknown. Current-price objects carry `currencyCode: USD`, but the observed list-price projection omits currency; comparison uses the same variant's verified USD current-price context and fails on an explicit currency conflict or missing currency evidence. Multi-variant prices and availability are retained per variant, not collapsed into an arbitrary product price.
+
+No snapshot/version token or safe cross-run resume contract has been established. Tests ran locally, not from AWS; no AWS CLI was available on PATH and no cloud resources were created. Browser/AgentCore runtime, regional suitability, unattended reliability, and costs remain untested. Research request bounds were 20 pages, 8 MB per response, a 30-second request timeout, and a one-second inter-page pause; these are probe limits, not approved production thresholds.
+
+Reproducible probes and JSON evidence are retained in this session's `files` directory, outside the plan-only repository: `lego_source_probe.py`, `lego_api_probe.py`, `lego_api_scan.py`, `test_lego_source_probe.py`, and dated HTML/API/browser/summary evidence. Both failed and successful full-traversal evidence remain available. No raw account response bodies or credentials are retained.
 
 [Playwright network monitoring](https://playwright.dev/docs/network) supports observing requests and responses around refresh and pagination. AWS documents both [agent-guided AgentCore Browser](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/browser-quickstart.html) and [direct Playwright control over AgentCore Browser](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/browser-quickstart-playwright.html). The latter can run without an LLM or agent framework. No AgentCore deployment has been tested in this session.
 
@@ -59,7 +75,7 @@ The attempted interactive pagination inspection did not establish the next-page 
 
 1. In a fresh, non-personal browser context, observe refresh and "Load More" traffic. Capture only necessary product request/response structure, status, pagination arguments, locale, totals, and price fields; redact tokens and exclude account/analytics payloads.
 2. Test whether an observed public product response can be fetched directly, without inherited personal cookies or copied session credentials. Record its schema and any operational dependencies.
-3. Independently test raw HTML and embedded listing JSON over HTTP, including all page boundaries. Compare set IDs, category membership, regular/current prices, availability, and totals with the rendered listing.
+3. Independently test raw HTML and embedded listing JSON over HTTP, including all page boundaries. Compare product codes, variant identities, category membership, regular/current prices, availability, and totals with the rendered listing.
 4. If HTTP approaches fail the acceptance criteria, prototype deterministic Playwright collection. Compare a self-managed browser worker with managed AgentCore Browser for AWS execution, session lifecycle, runtime, recovery, traceability, and cost.
 5. Evaluate agent-guided Playwright or AgentCore only where adaptive interaction provides demonstrated value. Record supported actions, model/tool boundaries, reproducibility, observation provenance, and cost controls.
 6. Select the simplest candidate that meets completeness, correctness, reproducibility, operability, and resource-bound criteria. Record the evidence and architecture decision; do not silently switch collectors after a failure.
@@ -73,6 +89,8 @@ The attempted interactive pagination inspection did not establish the next-page 
 | Agent-guided Playwright/AgentCore | Handles genuinely variable navigation | Measurable benefit over scripts; bounded actions and spend; deterministic validation independent of the agent |
 
 Technical stop conditions include authentication barriers, persistent blocked access, incomplete coverage, and inability to establish reliable evidence. Do not evade controls or reinterpret a failed scan as success. Terms-of-use and legal-notice analysis are outside this engineering plan.
+
+**Provisional direction:** prefer the observed product API for the next validation stage because it demonstrated credential-free complete pagination with a much smaller response body. Keep embedded HTML as a tested comparison candidate, not an automatic runtime fallback. Do not provision a browser or add an agent merely to mask conflicting source data. Final collector/runtime selection remains blocked on resolving the theme discrepancy policy, validating variant behavior and rendered availability, defining consistency/resume limits, and demonstrating access from the authorized AWS environment.
 
 ### Figure 1. Acquisition decision chart
 
@@ -100,7 +118,7 @@ flowchart TD
 |---|---|---|
 | Audience | Invited internal operator; same person owns product and operations | Public visitors, self-registration, customer accounts |
 | Market | Official US storefront, USD | Other regions, retailers, and currencies |
-| Catalog | Observed retiring sets and historical archive | Discounted-only sets and speculative retirement lists |
+| Catalog | Every observed category product, its variants, and historical archive | Products discounted outside the category and speculative retirement lists |
 | Interaction | Authenticated search/filter/sort, run health, authorized recovery | Purchasing, customer notifications, watchlists |
 | Time | Daily observations and explicit freshness | Live-price guarantees and predicted retirement dates |
 | Engineering | Controlled coding-agent work, independent review, CI/CD evidence | Agent self-approval, bypassing gates, silent production changes |
@@ -117,33 +135,42 @@ flowchart TD
 
 ### Figure 2. System context and trust boundary
 
+The two panels show the same system from separate perspectives. Shared names identify the same components; they are not duplicate services.
+
+#### Figure 2a. Observations and catalog data flow
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"darkMode":true,"background":"#1e1e1e","primaryColor":"#264653","primaryTextColor":"#f5f5f5","primaryBorderColor":"#93c5fd","secondaryColor":"#303030","secondaryTextColor":"#f5f5f5","secondaryBorderColor":"#93c5fd","tertiaryColor":"#303030","tertiaryTextColor":"#f5f5f5","tertiaryBorderColor":"#93c5fd","lineColor":"#d1d5db","textColor":"#f5f5f5","edgeLabelBackground":"#1e1e1e","clusterBkg":"#252526","clusterBorder":"#9ca3af","fontFamily":"Segoe UI, Arial, sans-serif","fontSize":"16px"},"flowchart":{"htmlLabels":false}}}%%
-flowchart LR
+flowchart TD
     LEGO["LEGO US storefront"]
-    Operator["Internal operator<br/>and product owner"]
-    Cognito["Invite-only Cognito sign-in"]
-    Alerts["Sentry to Slack<br/>CloudWatch operational monitoring"]
-    subgraph Tracker["Tracker-controlled application on AWS"]
-        Collect["Scheduled collection and validation"]
-        Store[("Published catalog and archive")]
-        Web["Authenticated operator UI and API"]
-        Admin["Authorized operational commands"]
-        Collect -->|"Validated publication"| Store
-        Store -->|"Snapshot and observation timestamps"| Web
-        Admin -->|"Pause or bounded rerun"| Collect
+    subgraph Tracker["Tracker application on AWS"]
+        Collect["Collect and validate"]
+        Store[("Catalog and archive")]
+        Web["Operator UI and API"]
+        Collect -->|"Publish validated scan"| Store
+        Store -->|"Dated snapshot"| Web
     end
-    LEGO -->|"Source observations"| Collect
-    Operator --> Cognito
-    Cognito -->|"Verified operator identity"| Web
-    Operator -->|"Search and inspect"| Web
-    Operator -->|"Authenticated operational action"| Admin
-    Web -->|"Observed facts and official links"| Operator
-    Operator -->|"Verify offer outside tracker"| LEGO
-    Collect -->|"Errors and run health"| Alerts
-    Web -->|"Application errors"| Alerts
-    Alerts -->|"Actionable notifications"| Operator
+    LEGO -->|"Observe"| Collect
+    Web -->|"Facts and source links"| Operator["Internal operator"]
 ```
+
+The operator searches and inspects the dated catalog, then follows official links to verify offers on LEGO's storefront outside the tracker. The UI and API require the identity and authorization shown below.
+
+#### Figure 2b. Operator access and operational controls
+
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"darkMode":true,"background":"#1e1e1e","primaryColor":"#264653","primaryTextColor":"#f5f5f5","primaryBorderColor":"#93c5fd","secondaryColor":"#303030","secondaryTextColor":"#f5f5f5","secondaryBorderColor":"#93c5fd","tertiaryColor":"#303030","tertiaryTextColor":"#f5f5f5","tertiaryBorderColor":"#93c5fd","lineColor":"#d1d5db","textColor":"#f5f5f5","edgeLabelBackground":"#1e1e1e","clusterBkg":"#252526","clusterBorder":"#9ca3af","fontFamily":"Segoe UI, Arial, sans-serif","fontSize":"16px"},"flowchart":{"htmlLabels":false}}}%%
+flowchart TD
+    Operator["Operator / product owner"] -->|"Sign in"| Cognito["Invite-only Cognito"]
+    Cognito -->|"Verify identity"| Auth["Server authorization"]
+    subgraph Tracker["Tracker application on AWS"]
+        Auth -->|"Read access"| Web["Operator UI and API"]
+        Auth -->|"Operational access"| Admin["Operational commands"]
+        Admin -->|"Pause or bounded rerun"| Collect["Collect and validate"]
+    end
+```
+
+Collection errors/run health and UI/API errors feed Sentry-to-Slack alerts and CloudWatch monitoring. Actionable notifications return to the same operator, who investigates and issues authorized recovery commands. This feedback path is detailed in Figure 5 and Section 8 rather than drawn across the access panel.
 
 Authentication and authorization must protect the UI, data API, and operational commands, not just hide navigation controls. The operator has no ordinary UI path to edit source facts or bypass validation. Collector writes use separate server-side IAM permissions.
 
@@ -153,7 +180,9 @@ Authentication and authorization must protect the UI, data API, and operational 
 
 Persistent stocks comprise published catalog snapshots, archive records, per-run observations and checkpoints, and operational run records.
 
-Each set observation carries set number, name, theme, official URL, image reference where available, USD current/regular prices in integer cents, availability, category evidence, observation timestamp, and run ID. Missing prices are unknown, not zero.
+Each product observation carries product code, name, nullable theme, source product type, official URL, image reference where available, category evidence, observation timestamp, and run ID. Preserve variant identities with USD current/regular prices in integer cents and availability per variant. Missing prices are unknown, not zero; an explicit null theme remains unknown rather than being guessed or causing the product to disappear.
+
+Single-variant products can expose that variant's price directly. Multi-variant products must remain in the catalog without presenting one arbitrary variant as the universal price or mixing current and regular prices from different variants. Variant selection, product-level price sorting, and discount-filter aggregation need an operator-approved UX rule before catalog implementation; retain all variant facts in the meantime.
 
 Separate the latest attempted check, the latest captured observation, and the latest observation committed in a published complete scan. A partial observation may improve diagnostics without advancing the catalog's price, membership, last-seen time, or successful-refresh timestamp.
 
@@ -168,7 +197,7 @@ The catalog is a coherent publication of a collection window, not a transactiona
 3. Make repeated page writes idempotent within that run. Exact duplicate identities can be deduplicated; conflicting records, inconsistent totals, and cursor anomalies require validation or refetch, not arbitrary last-write-wins.
 4. Resume only if the source pagination contract and checkpoint age support it. Prefer a source snapshot/version token if one exists. Without stable pagination, revalidate earlier segments or restart the full traversal; do not splice stale offset pages into a changing catalog and infer absence.
 5. Reject cross-run or cross-version checkpoint reuse unless explicitly validated. Never combine unrelated partial runs to manufacture a complete scan.
-6. Once all required segments and consistency checks pass, derive additions, updates, archival, and reappearance from the full observed set against the prior publication. No unobserved set is archived from partial coverage.
+6. Once all required segments and consistency checks pass, derive additions, updates, archival, and reappearance from the full observed product population against the prior publication. No unobserved product is archived from partial coverage. Variant disappearance alone does not establish product disappearance.
 7. Stage the resulting active catalog and archive together. Publish through a conditional pointer update that verifies lease ownership and the expected base version. A superseded run cannot replace a newer publication.
 8. On resume exhaustion, record terminal failure, preserve bounded diagnostic evidence, and leave publication unchanged. Expire partial records under the approved retention policy; cleanup must never remove the current snapshot.
 
@@ -206,7 +235,7 @@ flowchart TD
     Monitor["Independent expected-publication monitor"] -->|"Missed refresh"| Alert
 ```
 
-## 5. Nominal operation and set lifecycle
+## 5. Nominal operation and product lifecycle
 
 1. The scheduler initiates a daily run, or the operator requests an authorized rerun.
 2. The selected collector retrieves the complete category with bounded requests, retries, execution time, and browser/model use where applicable.
@@ -216,7 +245,7 @@ flowchart TD
 6. The authenticated UI serves snapshot-consistent, full-catalog search/filter/sort and pagination. It shows observed prices, valid discount percentages, availability, official links, and freshness.
 7. Run failures surface visibly and through Sentry-to-Slack; missed publication is detected independently of worker execution.
 
-### Figure 4. Set lifecycle
+### Figure 4. Product lifecycle
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"darkMode":true,"background":"#1e1e1e","primaryColor":"#264653","primaryTextColor":"#f5f5f5","primaryBorderColor":"#93c5fd","secondaryColor":"#303030","secondaryTextColor":"#f5f5f5","secondaryBorderColor":"#93c5fd","tertiaryColor":"#303030","tertiaryTextColor":"#f5f5f5","tertiaryBorderColor":"#93c5fd","lineColor":"#d1d5db","textColor":"#f5f5f5","edgeLabelBackground":"#1e1e1e","clusterBkg":"#252526","clusterBorder":"#9ca3af","fontFamily":"Segoe UI, Arial, sans-serif","fontSize":"16px"},"flowchart":{"htmlLabels":false}}}%%
@@ -233,7 +262,7 @@ stateDiagram-v2
     Archived --> Archived: Still absent; retain historical price
 ```
 
-Partial and failed runs cause no set-state transitions. A sold-out set remains active while listed. There is no "Confirmed retired" state: disappearance alone is insufficient evidence. Archive prices are last observed prices, not current offers.
+Partial and failed runs cause no product-state transitions. A sold-out product remains active while listed. There is no "Confirmed retired" state: disappearance alone is insufficient evidence. Archive prices are last observed prices, not current offers.
 
 ## 6. Operating modes and recovery
 
@@ -420,9 +449,9 @@ Completion requires persistent deployed behavior and evidence, not merely passin
 | ID | Invariant or outcome | Verification |
 |---|---|---|
 | AC-01 | Internal-only access | Anonymous and uninvited users cannot read data or invoke operations; invited operator succeeds through Cognito |
-| AC-02 | Correct category membership | Every active record has category-specific evidence; recommendations and discounted-only sets excluded |
+| AC-02 | Correct category membership | Every category product is included regardless of merchandise type; each active record has category-specific evidence; recommendations, promotional placements, and discounted-only products outside the category excluded |
 | AC-03 | Complete source coverage | Pagination and identities validated against source evidence; no fixed counts or article-count proxy |
-| AC-04 | Honest observed discounts | Integer-cent comparisons, unknown prices, conditional promotions, and live sample checks |
+| AC-04 | Honest observed discounts | Same-variant integer-cent comparisons, verified currency context, unknown prices/themes, conditional promotions, multi-variant pricing/filter/sort rules, and live sample checks |
 | AC-05 | Partial work cannot corrupt truth | Missing pages, stale checkpoints, source mutation, unsafe resume, and cross-run mixing tests leave publication unchanged |
 | AC-06 | Correct archival and restoration | Only complete scans archive; reappearance restores; sold-out status does not imply retirement |
 | AC-07 | Atomic publication | Lease loss, retries, concurrent writers, pointer conflicts, and interrupted writes expose no mixed snapshot |
@@ -437,21 +466,22 @@ Use deterministic fixtures for routine CI and a bounded live-source smoke test f
 
 | Todo ID | Work package | Exit condition |
 |---|---|---|
-| workspace | Attach and inspect project | Exact folder and isolation confirmed; existing instructions/files understood |
+| workspace | Attach and inspect project | Completed locally: direct workspace and plan-only Git repository inspected; no remote configured |
 | delivery | Establish SEMP controls | Agent/reviewer instructions, Habit Hooks/readability setup, CI and review-gate design recorded and exercised as tooling becomes available |
-| source | Research and select acquisition method | Network/raw-data/browser candidates evaluated; runtime and checkpoint-consistency strategy selected with evidence |
+| source | Research and select acquisition method | Local API/HTML full traversals and browser samples executed; final selection still requires consistency/variant policy and authorized AWS evidence |
 | foundation | Establish Gen 2 app and identity | Next.js, invite-only Cognito, typed data contracts, environment isolation, and baseline builds |
 | collector | Implement collection and reconciliation | Complete/partial/resume handling, deterministic validation, atomic publication, and tests |
 | catalog | Implement internal operator experience | Authenticated catalog/archive, full-dataset queries, honest freshness and error states |
 | operations | Establish operational controls | Daily schedule, Sentry-to-Slack, independent freshness/fallback alerts, recovery and retention |
 | verification | Demonstrate acceptance and release | CI/Cypress/reviewer evidence, authorized deployment, persistent live behavior, and runbooks |
 
-Dependencies: workspace -> delivery -> source -> foundation; collector and catalog follow foundation; operations follows collector; final verification follows catalog and operations. Delivery controls are established early and expanded alongside features, not deferred until release.
+Dependencies: workspace -> delivery -> source -> foundation; collector and catalog follow foundation; operations follows collector; final verification follows catalog and operations. The operator authorized the bounded local Section 2 research ahead of delivery setup; this does not waive delivery gates for application implementation. Delivery controls are established early and expanded alongside features, not deferred until release.
 
 Inputs still needed before their respective work packages:
 
-- Exact project path, isolation choice, GitHub repository, and authorized AWS deployment environment.
+- GitHub repository and authorized AWS deployment environment; local path and direct-workspace isolation are already confirmed.
 - Collector decision from the network/API/embedded-data/Playwright/AgentCore research, including regional availability and resource bounds.
+- Resolution policy for changing or conflicting source theme labels, plus multi-variant display, price-sort, and discount-filter semantics. Every category product remains in scope.
 - Approved checkpoint age/consistency, anomaly, freshness-grace, retry, retention, and source-readability rule limits.
 - Sentry project, Slack workspace/channel, and independent fallback destination; the operator already owns these responsibilities.
 - Copilot review/approval capabilities and enforceable current-head readiness gate; production promotion permissions.
