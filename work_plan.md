@@ -4,7 +4,11 @@
 
 Break the approved operating concept in [plan.md](./plan.md) into bounded tasks, explicit handoffs, and a dependency-aware parallel execution schedule.
 
-**Planning only.** Creating this document does not start implementation, dispatch implementation subagents, install dependencies, authorize repository publication, provision cloud resources, or approve a release. All tasks T01-T24 below are pending. The existing workspace setup and bounded local acquisition research are completed prerequisites, not newly completed implementation tasks.
+**Implementation authorized on 2026-09-24.** The operator explicitly requested execution with a different model for each specialist subagent. T01/T02 are in progress on the shared local branch `implementation/delivery-foundation`; later tasks remain subject to their dependency and authority gates. Existing workspace setup and bounded local acquisition research are completed prerequisites, not newly completed implementation tasks.
+
+The operator separately authorized commits/PRs and adding required GitHub review/check protections, without merging or weakening existing rules. Temporary AWS acquisition qualification is authorized for a Lambda function, least-privilege execution role and log group in account `687613142139`, `us-east-1`: at most three invocations, one concurrent run, a ten-minute timeout, no schedules/public endpoints/NAT gateway, and cleanup of temporary compute afterward. Persistent application/integration provisioning, new worktrees, and production release are not authorized by these decisions.
+
+Baseline GitHub ruleset `23971563` was configured and its effective rules verified, but the operator subsequently disabled it. A fresh read confirms no active rules on `main`; do not re-enable it without authorization. [Bootstrap PR #1](https://github.com/moro-no-kimi/devhawks/pull/1)'s initial revision passed delivery CI, while Copilot's first assessment was `COMMENTED` with findings, not approval. Every subsequent revision needs fresh CI/review evidence. Inactive required-workflow probes against published workflow code still return HTTP 422, including after the ruleset was disabled. G1 remains unproven; this change in enforcement state does not authorize a merge, waive findings, or imply a trusted review gate.
 
 The saved [CONOPS](./plan.md) is the requirements authority. This companion does not replace it or change its decisions:
 
@@ -20,6 +24,17 @@ Local API/HTML evidence supports a provisional API collector, but AWS-hosted acq
 ## 2. Subagent lanes and ownership
 
 Use **at most four active specialist subagents**, plus an integration lead. Reuse the same specialist for successive tasks in its lane. Do not create additional agents merely to reread completed work or substitute for the independent GitHub reviewer.
+
+The operator selected Codex, Astra, and configured DeepInfra models as the available pool, with a distinct model per specialist:
+
+| Lane | Assigned model | Initial dispatch |
+|---|---|---|
+| D - Delivery/backend | Codex (`gpt-5.3-codex`) | T01 |
+| Q - Verification | DeepInfra GLM-5.3-Flash (`customendpoint/DeepInfra/zai-org/GLM-5.3-Flash`) | T02 |
+| S - Source/operations | Astra (`gpt-6-astra`) | Wait for G1, then T03 |
+| U - Operator UI | DeepInfra MiMo V2.6 Pro (`customendpoint/DeepInfra/XiaomiMiMo/MiMo-V2.6-Pro`) | Wait for G3, then T11 |
+
+Future assignments reuse these lanes/models; they do not start merely because a model has been assigned.
 
 | Lane | Responsibility | Exclusive write boundary during implementation |
 |---|---|---|
@@ -53,9 +68,9 @@ Tasks start only when their hard predecessors are accepted **and** applicable au
 
 | Gate | Required evidence or decision | Work it permits |
 |---|---|---|
-| G0 - Implementation authorization | Operator explicitly authorizes implementation and its local tooling changes; repository publication/protected-setting changes require their own authority | Begin T01/T02; this document does not open G0 |
+| G0 - Implementation authorization | Received explicitly on 2026-09-24 for implementation/local tooling; GitHub publication and adding required protections were separately authorized | T01/T02 may proceed; no merging, worktree creation, or production authority is implied |
 | G1 - Delivery baseline | T01/T02 deliver pinned tooling, tested blocking behavior, selected skill discovery, and a trusted current-head review-gate design/enforcement demonstration | Begin the remaining source qualification and acceptance-case work |
-| G-AWS - Qualification resources | Operator authorizes bounded nonproduction AWS execution, role, resource/cost limits, evidence retention, and cleanup | Execute the AWS portion of T04; local STS access alone is insufficient |
+| G-AWS - Qualification resources | Bounded temporary Lambda qualification authorized on 2026-09-24 with the limits recorded in Section 1; verify fresh identity and scoped permissions before execution | Execute the AWS portion of T04 only after T03; local STS access alone is not qualification evidence |
 | G2 - Acquisition decision | T04 passes source correctness and AWS execution criteria; selected runtime and remaining uncertainty are recorded | Freeze implementation contracts in T06, also requiring T05 |
 | G-NP - Nonproduction integrations | Explicit scope for isolated Gen 2 backend/identities, CI role, Sentry/Slack test routing, SNS subscription, and test notifications | Cloud/integration portions of T07, T12, T17-T19, and T22; no production access |
 | G3 - Foundation and fixtures | T07/T08 supply a building, typed, isolated foundation, authorization boundaries, and common deterministic fixtures | Start parallel collector, publisher, UI, and authentication-test implementation |
@@ -118,7 +133,7 @@ Every implementation owner supplies its own focused unit/contract tests and rele
 
 ## 5. Gantt schedule
 
-The panels are consecutive parts of one schedule. `D001` means planning slot D01. Mermaid's January 2000 dates are neutral axis anchors, **not calendar commitments**. Milestones represent required evidence/authorization; their plotted positions assume no external wait. All bars describe future work, not progress.
+The panels are consecutive parts of one schedule. `D001` means planning slot D01. Mermaid's January 2000 dates are neutral axis anchors, **not calendar commitments**. Milestones represent required evidence/authorization; their plotted positions assume no external wait. Bars show the baseline schedule, not live task-completion status.
 
 ### A. Delivery, source qualification, and shared foundation
 

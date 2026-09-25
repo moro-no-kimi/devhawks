@@ -1,0 +1,5 @@
+node_modules/
+.venv/
+coverage/
+registry-cert.pem
+registry-chain.pem

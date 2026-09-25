@@ -1,0 +1,26 @@
+{
+  "headSha": "abc123",
+  "requiredChecks": [{ "name": "delivery-controls", "appSlug": "github-actions" }],
+  "checkRuns": [
+    {
+      "id": 1,
+      "name": "delivery-controls",
+      "headSha": "abc123",
+      "status": "completed",
+      "conclusion": "success",
+      "appSlug": "github-actions",
+      "startedAt": "2026-09-24T20:00:00Z",
+      "completedAt": "2026-09-24T20:01:00Z"
+    }
+  ],
+  "reviews": [
+    {
+      "id": 1,
+      "state": "APPROVED",
+      "submittedAt": "2026-09-24T20:02:00Z",
+      "commitId": "abc123",
+      "userLogin": "copilot-pull-request-reviewer[bot]"
+    }
+  ],
+  "reviewThreads": [{ "id": "thread-1", "isResolved": true, "isOutdated": false }]
+}

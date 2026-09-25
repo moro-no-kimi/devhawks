@@ -1,0 +1,2 @@
+plugins = ["typescript", "generic"]
+files = ["never-match/**/*.ts"]

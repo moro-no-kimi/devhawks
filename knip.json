@@ -1,0 +1,18 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "tools/delivery/src/copilotApprovalGate.ts",
+    "tools/delivery/src/githubCopilotApprovalCheck.ts",
+    "tools/delivery/src/habitHooksRunner.ts",
+    "tools/cypress/gate.cjs",
+    "tools/cypress/verify-skills.cjs",
+    "tools/cypress/record-checksums.cjs"
+  ],
+  "project": [
+    "tools/delivery/src/**/*.ts",
+    "tools/delivery/tests/**/*.ts",
+    "tools/cypress/**/*.cjs"
+  ],
+  "ignore": ["tools/delivery/fixtures/**"],
+  "ignoreDependencies": ["jscpd", "ts-morph"]
+}

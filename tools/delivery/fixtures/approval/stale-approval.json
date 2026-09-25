@@ -1,0 +1,26 @@
+{
+  "headSha": "new-sha",
+  "requiredChecks": [{ "name": "delivery-controls", "appSlug": "github-actions" }],
+  "checkRuns": [
+    {
+      "id": 2,
+      "name": "delivery-controls",
+      "headSha": "new-sha",
+      "status": "completed",
+      "conclusion": "success",
+      "appSlug": "github-actions",
+      "startedAt": "2026-09-24T20:00:00Z",
+      "completedAt": "2026-09-24T20:01:00Z"
+    }
+  ],
+  "reviews": [
+    {
+      "id": 2,
+      "state": "APPROVED",
+      "submittedAt": "2026-09-24T20:02:00Z",
+      "commitId": "old-sha",
+      "userLogin": "copilot-pull-request-reviewer[bot]"
+    }
+  ],
+  "reviewThreads": [{ "id": "thread-1", "isResolved": true, "isOutdated": false }]
+}

@@ -1,0 +1,3 @@
+habit-hooks==1.5.0
+habit-hooks-typescript==1.5.0
+habit-hooks-generic==1.5.0
