@@ -1,0 +1,41 @@
+{
+  "name": "devhawks-delivery-controls",
+  "version": "0.1.0",
+  "private": true,
+  "description": "T01 delivery-control baseline for local and CI enforcement.",
+  "type": "module",
+  "engines": {
+    "node": "24.14.1",
+    "npm": "11.12.1"
+  },
+  "packageManager": "npm@11.12.1",
+  "scripts": {
+    "format:check": "prettier --check \"AGENTS.md\" \".github/copilot-instructions.md\" \".github/workflows/*.yml\" \".jscpd.json\" \"package.json\" \"package-lock.json\" \"tsconfig.json\" \"eslint.config.mjs\" \"eslint.cypress.config.mjs\" \"knip.json\" \"tools/delivery/**/*.ts\" \"tools/delivery/**/*.tsx\" \"tools/delivery/**/*.json\" \"tools/cypress/**/*.cjs\"",
+    "format:write": "prettier --write \"AGENTS.md\" \".github/copilot-instructions.md\" \".github/workflows/*.yml\" \".jscpd.json\" \"package.json\" \"package-lock.json\" \"tsconfig.json\" \"eslint.config.mjs\" \"eslint.cypress.config.mjs\" \"knip.json\" \"tools/delivery/**/*.ts\" \"tools/delivery/**/*.tsx\" \"tools/delivery/**/*.json\" \"tools/cypress/**/*.cjs\"",
+    "lint": "eslint tools/delivery/src tools/delivery/tests --ext .ts,.tsx --max-warnings=0 && eslint --config eslint.cypress.config.mjs tools/cypress --ext .cjs --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run tools/delivery/tests",
+    "delivery:env:check": "tsx tools/delivery/src/deliveryEnvCheck.ts",
+    "delivery:habit-hooks": "tsx tools/delivery/src/habitHooksRunner.ts --config .habit-hooks/config.toml --cwd . --require-non-empty --scope-glob \"tools/delivery/src/**/*.ts\" --scope-glob \"tools/delivery/src/**/*.tsx\" --scope-glob \"tools/delivery/tests/**/*.ts\" --scope-glob \"tools/delivery/tests/**/*.tsx\"",
+    "delivery:duplication": "jscpd --config .jscpd.json --silent",
+    "delivery:unused": "knip --no-config-hints",
+    "delivery:cypress:gate-test": "node tools/cypress/gate.test.cjs",
+    "delivery:cypress:verify-skills": "node tools/cypress/verify-skills.cjs",
+    "delivery:copilot-gate:fixture": "tsx tools/delivery/src/copilotApprovalGate.ts --fixture tools/delivery/fixtures/approval/pass.json",
+    "delivery:copilot-gate:github": "tsx tools/delivery/src/githubCopilotApprovalCheck.ts",
+    "delivery:verify": "npm run delivery:env:check && npm run format:check && npm run lint && npm run delivery:unused && npm run delivery:duplication && npm run typecheck && npm run test && npm run delivery:cypress:gate-test && npm run delivery:cypress:verify-skills && npm run delivery:habit-hooks"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.35.0",
+    "@types/node": "24.3.0",
+    "eslint": "9.35.0",
+    "jscpd": "4.0.5",
+    "knip": "5.62.0",
+    "prettier": "3.6.2",
+    "ts-morph": "26.0.0",
+    "tsx": "4.20.5",
+    "typescript": "5.9.2",
+    "typescript-eslint": "8.43.0",
+    "vitest": "3.2.4"
+  }
+}

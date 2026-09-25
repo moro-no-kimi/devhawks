@@ -1,0 +1,115 @@
+{
+  "gate": "cypress-result-gate",
+  "task": "T02",
+  "owner": "lane Q",
+  "revision": {
+    "repository": "https://github.com/cypress-io/ai-toolkit",
+    "commit": "93212fc232adc5f88753d968bdf9bec243551c15",
+    "commit_date": "2026-09-21T15:31:09Z",
+    "commit_message": "Move vscode extension to mcp (#21)",
+    "author": "estrada9166",
+    "pinned_at": "2026-09-24",
+    "method": "Repository-only manual installation from the pinned upstream revision. Contents were compared with upstream Git blobs; only CRLF-to-LF and terminal-newline normalization is applied for reproducible cross-platform checkouts.",
+    "license": "MIT (Copyright (c) 2026 Cypress.io); the upstream notice is retained in CYPRESS-LICENSE and applies to the vendored Cypress skills"
+  },
+  "installedSkills": [
+    {
+      "name": "cypress-author",
+      "version": "1.0.1",
+      "reason": "write and repair tests using project conventions (plan.md T02, cypress-author row)",
+      "included": true
+    },
+    {
+      "name": "cypress-explain",
+      "version": "1.0.1",
+      "reason": "review/explain tests without writing code (plan.md T02, cypress-explain row)",
+      "included": true
+    },
+    {
+      "name": "cypress-docs",
+      "version": "1.0.0",
+      "reason": "ground in official Cypress documentation (plan.md T02, cypress-docs row)",
+      "included": true
+    },
+    {
+      "name": "cypress-tap",
+      "version": "1.0.0",
+      "reason": "live `cypress open` session debugging; runtime-compatible by documentation but live activation deferred to T12 (work_plan.md T12; requires Cypress 15.21.0+ and a Chromium-family browser)",
+      "included": true,
+      "activation": "deferred-to-T12"
+    }
+  ],
+  "explicitlyNotInstalled": [
+    {
+      "name": "cypress-cloud-cli",
+      "reason": "Cypress Cloud dependency explicitly declined by operator (plan.md: 'use Cypress AI Skills, not Cypress Cloud AI'); requires Node >= 22.21.0 and an authenticated Cloud organization, none authorized"
+    }
+  ],
+  "capabilitiesExcluded": [
+    "cy.prompt",
+    "runtime AI/self-healing",
+    "Cypress Cloud AI",
+    "cypress-cloud-cli",
+    "upload of private repo content, application DOM, or credentials to any external service"
+  ],
+  "userLevelNote": "No user-level (outside-repository) skill copies were retained; earlier turn-level copies under <USERPROFILE>\\ .copilot\\skills\\<skill> were removed; the .copilot\\skills root and existing non-T02 content (conops) were preserved.",
+  "discovery": {
+    "projectScoped": ".github\\skills\\<skill>\\SKILL.md — verified present with version metadata; filesystem level only, not a demonstrated live agent activation in this T02 run",
+    "verificationCommand": "node tools\\cypress\\verify-skills.cjs",
+    "userScope": "not used: verification and discovery are repository-only; the user-level skills directory is not required for CI",
+    "liveActivation": "deferred: work_plan.md separates 'selected skill discovery' (T02) from 'skills activate' (AC-10 → T12). Actual agent invocation (slash command or automatic trigger) is not demonstrated by this task and is explicitly not claimed.",
+    "filesystemVerified": true,
+    "liveActivationVerified": false
+  },
+  "runtimeCompatibility": [
+    {
+      "skill": "cypress-author",
+      "cypress": "project-version-aware per SKILL.md; no hard minimum documented in frontmatter",
+      "node": "not documented"
+    },
+    {
+      "skill": "cypress-explain",
+      "cypress": "no hard minimum documented",
+      "node": "not documented"
+    },
+    {
+      "skill": "cypress-docs",
+      "cypress": "no hard minimum documented",
+      "node": "not documented"
+    },
+    {
+      "skill": "cypress-tap",
+      "cypress": ">= 15.21.0 (SKILL.md description and docs.cypress.io)",
+      "browser": "Chromium-family browser required for `cypress tap`; not installed/activated in this T02 run; deferred to T12",
+      "node": "not documented"
+    }
+  ],
+  "references": [
+    "https://docs.cypress.io/app/tooling/ai-skills",
+    "https://github.com/cypress-io/ai-toolkit",
+    "https://github.com/cypress-io/ai-toolkit/blob/93212fc232adc5f88753d968bdf9bec243551c15/skills/README.md"
+  ],
+  "fileChecksums": {
+    "cypress-author/SKILL.md": "sha256:d3c77f763ebcdddaf8944b106a3cd1b733f647222fabc77c456b21bfe5db703e",
+    "cypress-author/references/author/async.md": "sha256:f1d62beaf8d464a3f527373cc935a421bf415f1eef8ee9509be785ec2e3e2e05",
+    "cypress-author/references/author/author-rules.md": "sha256:8a4b3bca31efb6f3bd4f7d6dc25acee60535166d9ff62a7a1589b22ea1498798",
+    "cypress-author/references/author/prompt.md": "sha256:2833367803c54736f7d1e327a7e73a5ab47468de7ec23739dfe3fdbfce9ffdaa",
+    "cypress-author/references/author/reusability.md": "sha256:c9b33309b82a7c47b57e3c382964de154c62f826a939591ce1a07ab9f24df489",
+    "cypress-author/references/documentation/documentation-rules.md": "sha256:50a9ae5c84b9a4f226f5592cf3a670430e9f75d8e49edbbf2ddc9369e58d7076",
+    "cypress-author/subskills/author.md": "sha256:a64857a3265c2b1d82f1a1c3296a8bd37c60ef6270b9230f0b93bfbbf67d59e2",
+    "cypress-author/subskills/task.md": "sha256:9ff434d631ecc9d56c3492ff9f8f0075513fe1f0aafc93d76fe547f4041ecc5a",
+    "cypress-explain/SKILL.md": "sha256:4cb9673a46e86132cd438a93837a762e2a32b881c6be52d7364f533d70448633",
+    "cypress-explain/references/documentation/documentation-rules.md": "sha256:db8553715fe7e334359f8e930ea072651071e8479ca1d44e55452a4036c08ab2",
+    "cypress-explain/references/explain/explain-cypress-rules.md": "sha256:d039fe909e8bfc28905467aab3116ae618c1c19f05251dec862c79d255f47135",
+    "cypress-explain/references/explain/explain-test-rules.md": "sha256:2367d1301e204d5d4870735eb12938dea3ce0ddc919bd16b42cbea87aa5dcbe4",
+    "cypress-docs/SKILL.md": "sha256:9714e74ff28cc1040754e15996345fff654abe97385aaa6fbfb52ffe143a6982",
+    "cypress-tap/SKILL.md": "sha256:22bfd1ec37c7d9e5db4c2672cb019effdf28eb202d709ef68fdcc313aaa0a9b1",
+    "cypress-tap/references/reading-results.md": "sha256:5612f6d2da8e0724449cfcd910fcf91ef313433321cb30c31c9a290d640d8ecb",
+    "cypress-tap/references/reading-the-app.md": "sha256:07035d6a8b42d4b8310f14067b517a81abee0c2282bd4c72ff63088a2a687599",
+    "cypress-tap/references/recipes.md": "sha256:6814c8603da4a47c0b483a56f9b8b7992c3dc6c0f7f1bac43ce70d694863fb4c",
+    "cypress-tap/references/session-lifecycle.md": "sha256:8968bd6fb36300f2ecc823602f52a1f0b3abb4409786e9c91ad537205d766f8b",
+    "cypress-tap/references/troubleshooting.md": "sha256:8291451da9ffeb71eb04ca09bf7093015232cd1cd8f443fd568656550729b095",
+    "CYPRESS-LICENSE": "sha256:b22e02cb8bf5cc600c0a6f11260741319ebf4752b0cdd48d4a9e2843692f6450"
+  },
+  "checksumMethod": "sha256 over LF-normalized repository bytes with a terminal newline; skill contents and license verified against the pinned upstream revision"
+}

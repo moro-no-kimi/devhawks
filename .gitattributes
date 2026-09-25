@@ -1,0 +1,9 @@
+.github/skills/** text eol=lf
+tools/cypress/*.cjs text eol=lf
+.github/workflows/*.yml text eol=lf
+*.json text eol=lf
+*.mjs text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.toml text eol=lf
+*.md text eol=lf

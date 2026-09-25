@@ -25,7 +25,7 @@ The system supports an operator's decision to inspect an offer on LEGO's store. 
 - Additional delivery gates include Habit Hooks, readability linting, unit tests, and Amplify-integrated Cypress behavior tests.
 - Use official Cypress AI Skills for the coding agent; do not add Cypress Cloud AI or `cy.prompt`. Required behavior tests remain ordinary, version-controlled Cypress code.
 
-This document describes the operating concept and a SEMP-equivalent delivery framework. The local workspace is attached at `C:\Users\RyanWalden\Repositories\devhawks`; its repository contains only this plan. On 2026-09-24 the operator authorized Section 2 acquisition research. Research probes and evidence are retained outside the repository in the session artifacts; no app or infrastructure has been implemented or deployed. Plan approval does not itself authorize those later activities.
+This document describes the operating concept and a SEMP-equivalent delivery framework. The local workspace is attached at `C:\Users\RyanWalden\Repositories\devhawks`. On 2026-09-24 the operator authorized Section 2 acquisition research and subsequently authorized implementation under [work_plan.md](./work_plan.md), which records the distinct subagent models and approval scopes. Delivery controls and selected Cypress skills are being established; source qualification and application work remain dependency-gated. Research probes and evidence are retained in the session artifacts. No application or AWS resources have been deployed. Approval of this document alone does not authorize later provisioning or release.
 
 ### Visual guide
 
@@ -443,7 +443,9 @@ On 2026-09-24, the operator selected [Cypress AI Skills](https://docs.cypress.io
 | `cypress-docs` | Verify commands and configuration against current official documentation and the pinned project version |
 | `cypress-tap` | Inspect and debug a project-specific live `cypress open` session when supported; the current guide requires Cypress 15.21.0 or later and a supported browser. Use headless `cypress run` for CI |
 
-During delivery setup, inspect the selected skills from the official [Cypress AI Toolkit](https://github.com/cypress-io/ai-toolkit), record the reviewed upstream revision, install them in a supported agent-discovery location, and verify they actually activate. Recheck version/browser compatibility before enabling `cypress-tap`. The Cloud-specific `cypress-cloud-cli` skill is not selected for this workflow. No skills or Cypress dependencies have been installed by this planning update.
+During delivery setup, inspect the selected skills from the official [Cypress AI Toolkit](https://github.com/cypress-io/ai-toolkit), record the reviewed upstream revision, install them in a supported agent-discovery location, and verify they actually activate. Recheck version/browser compatibility before enabling `cypress-tap`. The Cloud-specific `cypress-cloud-cli` skill is not selected for this workflow.
+
+T02 has installed the four selected skills at upstream revision `93212fc232adc5f88753d968bdf9bec243551c15` in the repository, with [provenance and checksums](./.github/skills/cypress-ai-skills-provenance.json) and the [upstream license notice](./.github/skills/CYPRESS-LICENSE). Source contents were verified with only declared newline normalization. Verification is repository-scoped and does not depend on personal home-directory copies. This establishes installation/integrity, not live skill activation or application behavior. Actual project-session activation remains T12 work; Cypress application/runtime integration has not started.
 
 Apply the skills' guidance without weakening the established gates:
 
@@ -531,6 +533,6 @@ The product behavior and deployment-target questions are resolved. The remaining
 - Exercise and review the delegated defaults in Section 4.3 before deployment; establish readable-source checks and justified exceptions through the delivery work package.
 - Verify Sentry access, create/use the selected project, configure Slack routing, confirm the SNS email subscription, and demonstrate failure/recovery delivery.
 - Demonstrate repository enforcement for current-head Copilot approval (approval capability is operator-confirmed enabled), required checks, and protected production promotion.
-- Obtain explicit authorization for app implementation and for any subsequent cloud provisioning/production release. The completed research and local AWS certificate/login setup do not themselves deploy the system.
+- Implementation is now authorized within the gates in [work_plan.md](./work_plan.md). Remain within the separately approved temporary AWS qualification scope; application/integration provisioning, new worktrees, merges, and production release require their applicable explicit approvals. Research, tooling, and account access do not themselves demonstrate a deployed application.
 
 No legal-review workstream is included. If technical prerequisites or review gates remain unresolved, keep the affected work blocked and report evidence rather than claiming production readiness.

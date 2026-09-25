@@ -1,0 +1,14 @@
+plugins = ["typescript", "generic"]
+files = [
+  "tools/delivery/fixtures/habit-hooks/clean/simple.ts",
+  "tools/delivery/fixtures/habit-hooks/clean/component.tsx"
+]
+
+[smells.duplicated-code]
+severity = "enforced"
+
+[sensors.knip]
+disabled = true
+
+[sensors.jscpd]
+disabled = true

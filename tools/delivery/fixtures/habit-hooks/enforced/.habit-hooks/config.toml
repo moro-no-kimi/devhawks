@@ -1,0 +1,11 @@
+plugins = ["typescript", "generic"]
+files = ["tools/delivery/fixtures/habit-hooks/enforced/tooManyParams.ts"]
+
+[smells.duplicated-code]
+severity = "enforced"
+
+[sensors.knip]
+disabled = true
+
+[sensors.jscpd]
+disabled = true

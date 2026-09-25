@@ -1,0 +1,10 @@
+{
+  "path": [
+    "tools/delivery/src",
+    "tools/delivery/tests",
+    "tools/delivery/fixtures",
+    "tools/cypress"
+  ],
+  "pattern": "**/*.{ts,tsx,cjs}",
+  "minTokens": 80
+}

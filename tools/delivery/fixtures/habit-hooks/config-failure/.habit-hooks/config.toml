@@ -1,0 +1,3 @@
+plugins = ["typescript", "generic"]
+files = ["src/**/*.ts"]
+uncoached = "invalid-value"

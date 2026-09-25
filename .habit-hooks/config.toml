@@ -1,0 +1,20 @@
+plugins = ["typescript", "generic"]
+# Habit Hooks typescript sensors invoke typed ESLint and fail on CJS parsing in
+# this repository. CJS coverage is enforced separately via root ESLint CJS rules,
+# Knip (unused), and JSCPD (duplication) in delivery:verify.
+files = [
+  "tools/delivery/src/**/*.ts",
+  "tools/delivery/src/**/*.tsx",
+  "tools/delivery/tests/**/*.ts",
+  "tools/delivery/tests/**/*.tsx"
+]
+uncoached = "enforce"
+
+[scope]
+changedOnly = false
+autoBranchOffMain = false
+branchBase = "main"
+mainBranch = "main"
+
+[smells.duplicated-code]
+severity = "enforced"
