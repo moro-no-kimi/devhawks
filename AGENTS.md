@@ -14,5 +14,6 @@
 
 ## Learnings
 
+- Delegate routine PR-comment fixes and CI diagnosis to the designated Codex/DeepInfra lanes. The integration lead coordinates scope and approvals and verifies handoffs without repeating the full investigation; reserve higher-cost reasoning for genuinely complex decisions.
 - Negative control tests must exercise the policy CI actually uses: adding `--threshold 0` only in a JSCPD test does not enforce an unconfigured root command. Require evidence of the intended violation; a missing executable is not a passing negative test. Test malformed nested report collections and exact skill allowlists, not just missing required entries.
 - A check name, GitHub Actions app identity, or checkout of `main` does not pin a PR-controlled workflow definition. Qualify required-workflow availability for the repository's ownership and plan, or use a separately trusted controller; never claim enforcement from local gate tests alone.

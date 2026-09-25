@@ -25,11 +25,29 @@ jobs:
           ref: refs/heads/main
           persist-credentials: false
 
+      - name: Verify trusted controls are published on main
+        run: |
+          missing=0
+          for file in \
+            package.json \
+            package-lock.json \
+            tools/delivery/src/copilotApprovalEvaluator.ts \
+            tools/delivery/src/githubCopilotApprovalCheck.ts
+          do
+            if [ ! -f "$file" ]; then
+              echo "::error::Missing trusted control file on main: $file"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo "::error::Trusted approval-gate controls are not yet on main. Publish trusted baseline to main before requiring this check."
+            exit 1
+          fi
+
       - name: Setup Node
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24.14.1
-          cache: npm
 
       - name: Pin npm for gate runtime
         run: npm i -g npm@11.12.1
