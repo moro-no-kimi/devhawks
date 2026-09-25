@@ -83,6 +83,29 @@ function validateProvenanceRecord(prov) {
   };
 }
 
+function sameSkillSet(names) {
+  return (
+    names.length === REQUIRED_SKILLS.length && REQUIRED_SKILLS.every((name) => names.includes(name))
+  );
+}
+
+function validateInstalledSkillSets(root, installedSkills, problems) {
+  const declared = installedSkills.map((entry) =>
+    entry && typeof entry === "object" ? entry.name : undefined
+  );
+  if (!sameSkillSet(declared)) {
+    problems.push("declared skill set must exactly match the four approved skills");
+  }
+  const entries = fs.readdirSync(root, { withFileTypes: true });
+  if (entries.some((entry) => entry.isSymbolicLink())) {
+    problems.push("symbolic links are not approved skill installations");
+  }
+  const directories = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name);
+  if (!sameSkillSet(directories)) {
+    problems.push("on-disk skill set must exactly match the four approved skills");
+  }
+}
+
 function validateLicense(root, fileChecksums, problems) {
   const license = path.join(root, "CYPRESS-LICENSE");
   if (!fs.existsSync(license)) {
@@ -204,6 +227,8 @@ function verify(skillsRoot, provenancePath) {
   const { pinnedCommit, fileChecksums } = validated;
 
   const problems = [];
+  validateInstalledSkillSets(root, prov.installedSkills, problems);
+  if (problems.length > 0) return finishVerification(problems, root, pinnedCommit);
   validateLicense(root, fileChecksums, problems);
   for (const skill of REQUIRED_SKILLS) {
     validateSkill({ root, skill, prov, fileChecksums, problems });

@@ -6,5 +6,6 @@
     "tools/cypress"
   ],
   "pattern": "**/*.{ts,tsx,cjs}",
-  "minTokens": 80
+  "minTokens": 80,
+  "threshold": 0
 }

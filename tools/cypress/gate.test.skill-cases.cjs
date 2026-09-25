@@ -82,7 +82,43 @@ function registerIntegrityCases(ctx) {
   });
 }
 
+function registerAllowlistCases(ctx) {
+  const { test, fs, path, makeFixtureDir, assert } = ctx;
+  for (const mode of [
+    "extra-directory",
+    "extra-declaration",
+    "duplicate-declaration",
+    "missing-declaration"
+  ]) {
+    test("verify-skills rejects " + mode, () => {
+      const dir = makeFixtureDir("skill-allowlist");
+      const root = path.join(dir, "skills");
+      try {
+        fs.mkdirSync(root, { recursive: true });
+        copyRepoSkills(root, fs, path);
+        const provPath = path.join(root, "cypress-ai-skills-provenance.json");
+        const prov = JSON.parse(fs.readFileSync(provPath, "utf8"));
+        if (mode === "extra-directory") {
+          const extra = path.join(root, "cypress-cloud-cli");
+          fs.mkdirSync(extra);
+          fs.writeFileSync(path.join(extra, "SKILL.md"), "---\nname: cypress-cloud-cli\n---\n");
+        }
+        if (mode === "extra-declaration") {
+          prov.installedSkills.push({ name: "cypress-cloud-cli", included: true });
+        }
+        if (mode === "duplicate-declaration") prov.installedSkills.push(prov.installedSkills[0]);
+        if (mode === "missing-declaration") prov.installedSkills.pop();
+        fs.writeFileSync(provPath, JSON.stringify(prov));
+        assert.strictEqual(verifier.verify(root, provPath), false);
+      } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
+    });
+  }
+}
+
 module.exports = function registerSkillCaseSet(ctx) {
   registerChecksumCases(ctx);
   registerIntegrityCases(ctx);
+  registerAllowlistCases(ctx);
 };

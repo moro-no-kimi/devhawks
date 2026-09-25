@@ -79,14 +79,15 @@ function assertSuiteObject(suite, spec) {
 }
 
 function collectTestsRecursive(node, spec, out) {
-  const tests = Array.isArray(node.tests) ? node.tests : [];
-  for (const test of tests) {
+  if (!Array.isArray(node.tests) || !Array.isArray(node.suites)) {
+    throw gateError("malformed-report", "every report node must contain tests and suites arrays");
+  }
+  for (const test of node.tests) {
     assertTestObject(test, spec);
     out.push({ spec: spec, test: test });
   }
 
-  const suites = Array.isArray(node.suites) ? node.suites : [];
-  for (const suite of suites) {
+  for (const suite of node.suites) {
     assertSuiteObject(suite, spec);
     collectTestsRecursive(suite, spec, out);
   }

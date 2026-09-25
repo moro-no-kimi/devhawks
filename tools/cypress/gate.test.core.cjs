@@ -29,6 +29,33 @@ test("correct passing fresh report passes the gate", () => {
   expectPassed(r);
 });
 
+for (const level of ["root", "nested"]) {
+  for (const member of ["tests", "suites"]) {
+    for (const value of [undefined, null, {}, "hidden-results"]) {
+      test(
+        "malformed " + level + " " + member + " collection is rejected: " + String(value),
+        () => {
+          const report = validReport([
+            specEntry("cypress/e2e/schema.cy.js", [passTest("visible")])
+          ]);
+          const node = level === "root" ? report.results[0] : { tests: [], suites: [] };
+          if (level === "nested") report.results[0].suites.push(node);
+          node[member] = value;
+          expectBlocked(
+            runGate(report, [
+              "--expect-run-id",
+              "run-1",
+              "--require-spec",
+              "cypress/e2e/schema.cy.js"
+            ]),
+            "malformed-report"
+          );
+        }
+      );
+    }
+  }
+}
+
 test("release-gate mode blocks when no require-spec inventory is provided", () => {
   const report = validReport([specEntry("cypress/e2e/whatever.cy.js", [passTest("a")])]);
   const r = runGate(report, [

@@ -11,3 +11,8 @@
 - Preserve vendored skill text except for its declared newline normalization. Verify its pinned checksums and license; do not apply house formatting or whitespace cleanup to upstream content.
 - Only the integration lead performs authorized Git/PR operations. New worktrees, infrastructure, merges, and production release require their applicable explicit approvals.
 - Keep collector/app implementation out of scope until G2/G3 authorization.
+
+## Learnings
+
+- Negative control tests must exercise the policy CI actually uses: adding `--threshold 0` only in a JSCPD test does not enforce an unconfigured root command. Require evidence of the intended violation; a missing executable is not a passing negative test. Test malformed nested report collections and exact skill allowlists, not just missing required entries.
+- A check name, GitHub Actions app identity, or checkout of `main` does not pin a PR-controlled workflow definition. Qualify required-workflow availability for the repository's ownership and plan, or use a separately trusted controller; never claim enforcement from local gate tests alone.

@@ -48,15 +48,16 @@ function resultsSummary(report, options) {
 function run(argv, isReleaseGate) {
   let options;
   let report;
+  let problems;
   try {
     options = parseArgs(argv);
     report = parseReport(options.report);
+    problems = validate(report, options, isReleaseGate !== false);
   } catch (error) {
     fail(error.reason || "error", error.message);
     return;
   }
 
-  const problems = validate(report, options, isReleaseGate !== false);
   if (problems.length > 0) {
     for (const error of problems) {
       fail(error.reason || "error", error.message);
